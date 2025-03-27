@@ -65,7 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
       onAuthStateChanged(auth, async (user) => {
         if (user) {
           // User is signed in, record download and proceed
-          const downloadUrl = `https://example.com/datasets/${datasetId}.zip`;
+          // Get download URL from button's data-url attribute
+          const downloadUrl = button.dataset.url || `https://example.com/datasets/${datasetId}.zip`;
           
           // Get user name from Firestore
           const userDoc = await getDoc(doc(db, 'users', user.uid));
