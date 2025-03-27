@@ -1,0 +1,38 @@
+---
+layout: default
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title }} | GeoInvention Dataset</title>
+  <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/style.css">
+</head>
+<body>
+
+  <main>
+    {{ content }}
+  </main>
+
+  <!-- <script type="module">
+    import { auth } from './main.js';
+    
+    // Check authentication on all pages
+    auth.onAuthStateChanged((user) => {
+      if (!user && !window.location.pathname.includes('login.html')) {
+        sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+        window.location.href = '/login.html';
+      }
+    });
+  </script> -->
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>&copy; 2025 GeoInvention Dataset. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="{{ site.baseurl }}/main.js"></script>
+</body>
+</html>

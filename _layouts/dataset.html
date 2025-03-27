@@ -1,0 +1,99 @@
+---
+layout: default
+---
+
+<article class="dataset-detail">
+  <header>
+    <h1>{{ page.title }}</h1>
+    <div class="meta">
+      <span class="date">Published: {{ page.date | date: "%B %d, %Y" }}</span>
+      <br/>
+      <span class="author">Author: {{ page.author }}</span>
+      {% if page.categories %}
+      <div class="categories">
+        <span>Categories: </span>
+        {% for category in page.categories %}
+          <a href="/{{ category | slugify }}" class="category-tag">{{ category }}</a>
+          {% unless forloop.last %} > {% endunless %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="content">
+    {{ content }}
+  </div>
+
+  <div class="download-section">
+    <h2>Download Dataset</h2>
+    <p>This dataset contains {{ page.size }} of data in {{ page.format }} format.</p>
+    <a href="{{ page.download_url }}" class="btn" id="download-btn">📥 Download Now</a>
+  </div>
+</article>
+
+<script type="module">
+  import { auth } from '/main.js';
+  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+  // Track downloads
+  document.getElementById('download-btn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    if (!auth.currentUser) {
+      sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+      window.location.href = '/login.html';
+      return;
+    }
+    
+    const db = getFirestore();
+    
+    try {
+      await setDoc(doc(db, "downloads", Date.now().toString()), {
+        userId: auth.currentUser.uid,
+        userEmail: auth.currentUser.email,
+        datasetId: "{{ page.id }}",
+        datasetTitle: "{{ page.title }}",
+        timestamp: serverTimestamp()
+      });
+      
+      window.location.href = e.target.href;
+    } catch (error) {
+      console.error("Failed to record download:", error);
+    }
+  });
+</script>
+
+<style>
+  .dataset-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  .dataset-detail header {
+    margin-bottom: 2rem;
+  }
+  
+  .dataset-detail h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .meta {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .download-section {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: #f5f5f5;
+    border-radius: 5px;
+  }
+  
+  .download-section h2 {
+    margin-top: 0;
+  }
+</style>
