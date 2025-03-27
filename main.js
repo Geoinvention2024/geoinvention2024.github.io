@@ -66,7 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
           // User is signed in, record download and proceed
           // Get download URL from button's data-url attribute
-          const downloadUrl = button.dataset.url || `https://example.com/datasets/${datasetId}.zip`;
+          const downloadUrl = button.dataset.url;
+          console.log('Download URL from button:', downloadUrl); // Debug log
+          if (!downloadUrl) {
+            console.error('Download URL not found on button:', button);
+            return;
+          }
           
           // Get user name from Firestore
           const userDoc = await getDoc(doc(db, 'users', user.uid));
