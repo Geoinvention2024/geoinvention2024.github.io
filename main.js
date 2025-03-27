@@ -8,7 +8,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDzmWDaBLZaNE-S1PH-34snH3HmjauJqlM",
@@ -67,13 +67,22 @@ document.addEventListener('DOMContentLoaded', () => {
           // User is signed in, record download and proceed
           const downloadUrl = `https://example.com/datasets/${datasetId}.zip`;
           
+          // Get user name from Firestore
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userName = userDoc.exists() ? userDoc.data().name : 'Unknown';
+          
+          // Get page title
+          const pageTitle = document.querySelector('h1')?.textContent || 'Untitled Dataset';
+          
           // Record download in Firestore
           const downloadsRef = collection(db, 'downloads');
           await addDoc(downloadsRef, {
             userId: user.uid,
             datasetId: datasetId,
             timestamp: new Date(),
-            email: user.email
+            email: user.email,
+            userName: userName,
+            datasetTitle: pageTitle
           });
           
           window.location.href = downloadUrl;
