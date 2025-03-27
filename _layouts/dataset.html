@@ -28,41 +28,9 @@ layout: base
   <div class="download-section">
     <h2>Download Dataset</h2>
     <p>This dataset contains {{ page.size }} of data in {{ page.format }} format.</p>
-    <a href="{{ page.download_url }}" class="btn" id="download-btn">📥 Download Now</a>
+    <a href="{{ page.download_url }}" class="btn download-btn" data-id="{{ page.id }}">📥 Download Now</a>
   </div>
 </article>
-
-<script type="module">
-  import { auth } from '/main.js';
-  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-  // Track downloads
-  document.getElementById('download-btn').addEventListener('click', async (e) => {
-    e.preventDefault();
-    
-    if (!auth.currentUser) {
-      sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-      window.location.href = '/login.html';
-      return;
-    }
-    
-    const db = getFirestore();
-    
-    try {
-      await setDoc(doc(db, "downloads", Date.now().toString()), {
-        userId: auth.currentUser.uid,
-        userEmail: auth.currentUser.email,
-        datasetId: "{{ page.id }}",
-        datasetTitle: "{{ page.title }}",
-        timestamp: serverTimestamp()
-      });
-      
-      window.location.href = e.target.href;
-    } catch (error) {
-      console.error("Failed to record download:", error);
-    }
-  });
-</script>
 
 <style>
   .dataset-detail {
