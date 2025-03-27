@@ -54,6 +54,28 @@ layout: default
     </section>
   </div>
   <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-  <script type="module" src="{{ "/main.js" | relative_url }}"></script>
+  <script type="module">
+    import { auth } from '{{ "/main.js" | relative_url }}';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    
+    const authBtn = document.getElementById('auth-btn');
+    const userEmail = document.getElementById('user-email');
+    
+    if (authBtn && userEmail) {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          userEmail.textContent = user.email;
+          authBtn.textContent = 'Logout';
+          authBtn.onclick = () => auth.signOut();
+        } else {
+          userEmail.textContent = '';
+          authBtn.textContent = 'Login';
+          authBtn.onclick = () => {
+            window.location.href = '/login.html';
+          };
+        }
+      });
+    }
+  </script>
 </body>
 </html>

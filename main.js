@@ -1,6 +1,13 @@
 // Firebase initialization
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  setPersistence, 
+  browserLocalPersistence,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -14,6 +21,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence);  // 添加持久化设置
 const db = getFirestore(app);
 
 // Mobile menu toggle
@@ -79,33 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Auth state and modal interaction logic
-const authBtn = document.getElementById('auth-btn');
-const userEmail = document.getElementById('user-email');
-
-if (authBtn && userEmail) {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      userEmail.textContent = user.email;
-      authBtn.textContent = 'Logout';
-      authBtn.onclick = () => auth.signOut();
-    } else {
-      userEmail.textContent = '';
-      authBtn.textContent = 'Login';
-      authBtn.onclick = () => {
-        const authModal = document.getElementById('auth-modal');
-        if (authModal) {
-          authModal.style.display = 'block';
-          document.getElementById('login-section').style.display = 'block';
-          document.getElementById('register-section').style.display = 'none';
-          document.getElementById('auth-error').textContent = '';
-        } else {
-          window.location.href = `/login.html?return=${encodeURIComponent(window.location.pathname)}`;
-        }
-      };
-    }
-  });
-}
 
 // Modal interaction logic
 const authModal = document.getElementById('auth-modal');
