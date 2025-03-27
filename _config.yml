@@ -41,9 +41,9 @@ search:
   focus_shortcut_key: 'k'
 
 # ANCHOR - Aux links for the upper right navigation
-aux_links:
-  "PolyU Geoinvention Lab":
-    - "www.geoinvention.com"
+# aux_links:
+#   "PolyU Geoinvention Lab":
+#     - "www.geoinvention.com"
 
 # Makes Aux links open in a new tab. Default is false
 aux_links_new_tab: true
