@@ -131,7 +131,7 @@ if (loginSection && registerSection) {
 
         // Delete any existing sessions first
         console.log("Deleting existing sessions...");
-        await account.deleteSessions();
+        // await account.deleteSessions();
 
         console.log("Creating new session...");
         const session = await account.createEmailPasswordSession(

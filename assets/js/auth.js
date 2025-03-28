@@ -32,35 +32,45 @@ async function checkSession() {
     }
 
     // Check session with timeout
-    const user = await Promise.race([
-      window.account.get(),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Session check timeout')), 5000)
-      )
-    ]);
-    
-    userEmail.textContent = user.email;
-    authBtn.textContent = 'Logout';
-    authBtn.onclick = async () => {
-      await window.account.deleteSession('current');
-      window.location.reload();
-    };
-  } catch (error) {
-    console.error('Session check failed:', error);
-    
-    // Clear any existing session
+    let user = null;
     try {
-      await window.account?.deleteSession('current');
-    } catch (e) {
-      console.log('Failed to clear session:', e.message);
+      user = await Promise.race([
+        window.account.get(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session check timeout')), 5000)
+        )
+      ]);
+    } catch (error) {
+      console.warn('Session check failed, falling back to guest mode:', error);
     }
     
-    userEmail.textContent = '';
-    authBtn.textContent = 'Login';
-    authBtn.onclick = () => {
-      const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
-      window.location.href = `/login.html?return=${returnUrl}`;
-    };
+    if (user) {
+      userEmail.textContent = user.email;
+      authBtn.textContent = 'Logout';
+      authBtn.onclick = async () => {
+        try {
+          await window.account.deleteSession('current');
+          // 完全重置客户端状态
+          window.client = null;
+          window.account = null;
+        } catch (e) {
+          console.warn('Logout failed:', e);
+        }
+        // 强制刷新页面以完全重置状态
+        window.location.href = window.location.pathname;
+      };
+    } else {
+      // Guest mode
+      userEmail.textContent = '';
+      authBtn.textContent = 'Login';
+      authBtn.onclick = () => {
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/login.html?return=${returnUrl}`;
+      };
+    }
+  } catch (error) {
+    console.error('Session check failed:', error);
+    // No need to duplicate guest mode handling here
   } finally {
     authBtn.disabled = false;
   }
@@ -79,8 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Force UI update
     authBtn.textContent = 'Logout';
     authBtn.onclick = async () => {
-      await window.account.deleteSession('current');
-      window.location.reload();
+      try {
+        await window.account.deleteSession('current');
+        window.client = null;
+        window.account = null;
+        window.location.href = window.location.pathname;
+      } catch (e) {
+        console.warn('Logout failed:', e);
+      }
     };
     
     // Get and display user email
