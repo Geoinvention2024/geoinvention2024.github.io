@@ -30,7 +30,7 @@ layout: base
     <h2>Download Dataset</h2>
     <!-- <p>This dataset contains {{ page.size }} of data in {{ page.format }} format.</p> -->
      <p>Click the button below and wait a few seconds for the file save dialog to appear.</p>
-    <a href="{{ page.download_url }}" class="btn download-btn" data-id="{{ page.id }}" data-url="{{ page.download_url }}">📥 Download Now</a>
+    <button class="btn download-btn" data-id="{{ page.id }}" data-url="{{ page.download_url }}">📥 Download Now</button>
   </div>
 </article>
 
@@ -67,3 +67,33 @@ layout: base
     margin-top: 0;
   }
 </style>
+
+<script>
+(function() {
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - initializing download button');
+    const downloadBtn = document.querySelector('.download-btn');
+    
+    if (downloadBtn) {
+      console.log('Download button found');
+      downloadBtn.addEventListener('click', async function() {
+        console.log('Download button clicked');
+        try {
+          console.log('Checking login status');
+          await window.account.get();
+          console.log('User logged in, proceeding to download');
+          window.location.href = this.dataset.url;
+        } catch (error) {
+          console.error('Login check failed:', error);
+          alert('Please login first to download this dataset');
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 500);
+        }
+      });
+    } else {
+      console.error('Download button not found');
+    }
+  });
+})();
+</script>

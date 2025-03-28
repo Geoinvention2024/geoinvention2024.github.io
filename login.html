@@ -27,6 +27,7 @@ layout: home
         </div>
         
         <button type="submit" class="btn">Login</button>
+        <div id="auth-error" class="error-message"></div>
       </form>
       
       <p class="toggle-form">Don't have an account? <a href="#" id="show-register">Register</a></p>
@@ -64,103 +65,11 @@ layout: home
     <div id="success-message" class="success-message"></div>
   </div>
 
-  <script type="module">
-    import { auth, db } from './main.js';
-    import { 
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword,
-      sendEmailVerification
-    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-    import { collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-    // Form toggle
-    document.getElementById('show-register').addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('login-section').style.display = 'none';
-      document.getElementById('register-section').style.display = 'block';
-    });
-
-    document.getElementById('show-login').addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('register-section').style.display = 'none';
-      document.getElementById('login-section').style.display = 'block';
-    });
-
-    // Login form
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const errorMessage = document.getElementById('error-message');
-      errorMessage.textContent = '';
-      
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        if (!user.emailVerified) {
-          errorMessage.textContent = 'Please verify your email first. Check your inbox.';
-          return;
-        }
-        
-        // Redirect to original page or home after short delay
-        setTimeout(() => {
-          const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || '/';
-          sessionStorage.removeItem('redirectAfterLogin');
-          window.location.href = redirectUrl;
-        }, 500);
-      } catch (error) {
-        errorMessage.textContent = 'Login failed: ' + error.message;
-      }
-    });
-
-    // Register form
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById('reg-email').value;
-      const password = document.getElementById('reg-password').value;
-      const confirm = document.getElementById('reg-confirm').value;
-      const errorMessage = document.getElementById('error-message');
-      const successMessage = document.getElementById('success-message');
-      
-      errorMessage.textContent = '';
-      successMessage.textContent = '';
-      
-      // Validate password match
-      if (password !== confirm) {
-        errorMessage.textContent = 'Passwords do not match';
-        return;
-      }
-      
-      try {
-        const name = document.getElementById('reg-name').value;
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        // Save user data to Firestore
-        await setDoc(doc(db, "users", user.uid), {
-          email: email,
-          name: name,
-          createdAt: new Date()
-        });
-        
-        await sendEmailVerification(user);
-        
-        successMessage.textContent = 'Registration successful! Please check your email to verify your account.';
-        document.getElementById('register-form').reset();
-        
-        // Switch back to login after 3 seconds
-        setTimeout(() => {
-          document.getElementById('register-section').style.display = 'none';
-          document.getElementById('login-section').style.display = 'block';
-        }, 3000);
-      } catch (error) {
-        errorMessage.textContent = 'Registration failed: ' + error.message;
-      }
-    });
-  </script>
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@16.0.0"></script>
+    <script>
+      const { Client, Account, Databases } = Appwrite;
+    </script>
+    <script src="/main.js"></script>
 
   <style>
     .login-container {

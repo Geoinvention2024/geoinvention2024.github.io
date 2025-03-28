@@ -97,6 +97,10 @@ just_the_docs:
 # ANCHOR - katex for Just-the-docs
 math: katex
 
+# Server configuration
+host: localhost
+port: 4000
+
 # Suppress Sass deprecation warnings
 sass:
   style: compressed
