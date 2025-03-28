@@ -98,15 +98,27 @@ if (loginSection && registerSection) {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       const errorElement = document.getElementById("auth-error");
-      const returnUrl =
-        new URLSearchParams(window.location.search).get("return") || "/";
+        // Get return URL from query params or referrer
+        let returnUrl = new URLSearchParams(window.location.search).get("return");
+        if (!returnUrl) {
+          // If no explicit return URL, try to get from document.referrer
+          try {
+            const referrer = new URL(document.referrer);
+            if (referrer.origin === window.location.origin) {
+              returnUrl = referrer.pathname + referrer.search;
+            }
+          } catch (e) {
+            console.log("Could not parse referrer:", e);
+          }
+        }
+        returnUrl = returnUrl || "/";
 
-      // Clear previous errors
-      errorElement.textContent = "";
-      errorElement.style.display = "none";
+        // Clear previous errors
+        errorElement.textContent = "";
+        errorElement.style.display = "none";
 
-      console.log("Login attempt started for:", email);
-      console.log("Return URL:", returnUrl);
+        console.log("Login attempt started for:", email);
+        console.log("Using return URL:", returnUrl);
 
       try {
         if (!email || !password) {
@@ -129,7 +141,10 @@ if (loginSection && registerSection) {
         console.log("Session created:", session);
 
         console.log("Login successful, redirecting to:", returnUrl);
-        window.location.href = returnUrl;
+        // Add login=success parameter to trigger session check
+        const redirectUrl = new URL(returnUrl, window.location.origin);
+        redirectUrl.searchParams.set('login', 'success');
+        window.location.href = redirectUrl.toString();
       } catch (error) {
         console.error("Login failed:", error);
         console.error("Error details:", {
@@ -139,9 +154,28 @@ if (loginSection && registerSection) {
           response: error.response,
         });
 
-        errorElement.textContent = error.message.includes("Invalid credentials")
-          ? "Invalid email or password"
-          : "Login failed. Please try again later.";
+        if (error.message.includes("Invalid credentials")) {
+          errorElement.textContent = "Invalid email or password";
+        } else if (error.message.includes("missing scope (account)")) {
+          errorElement.innerHTML = `
+            <div style="text-align: left">
+              <p>Account access issue detected. Possible reasons:</p>
+              <ul>
+                <li>Your account hasn't been activated yet</li>
+                <li>You need to <a href='#' id='switch-to-register'>register</a> first</li>
+                <li>Your account may be pending approval</li>
+              </ul>
+              <p>Please contact support if you believe this is an error.</p>
+            </div>
+          `;
+          document.getElementById('switch-to-register')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginSection.style.display = "none";
+            registerSection.style.display = "block";
+          });
+        } else {
+          errorElement.textContent = "Login failed. Please try again later. If the problem persists, contact support.";
+        }
         errorElement.style.display = "block";
       }
     });
