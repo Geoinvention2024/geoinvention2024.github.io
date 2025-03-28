@@ -1,5 +1,6 @@
 title: Geoinvention Dataset
 description: A starter template for a Jeykll site using the Just the Docs theme!
+
 theme: just-the-docs
 
 url: https://just-the-docs.github.io
@@ -62,12 +63,22 @@ heading_anchors: true
 
 # ANCHOR Callouts
 # To use this feature, you need to configure a color and (optionally) title for each kind of callout you want to use, e.g.:
-# TODO - More callouts
+callouts_level: quiet # or loud
 callouts:
+  highlight:
+    color: yellow
+  important:
+    title: Important
+    color: blue
+  new:
+    title: New
+    color: green
+  note:
+    title: Note
+    color: purple
   warning:
     title: Warning
     color: red
-    opacity: 0.3
 
 # ANCHOR - Document collections
 collections:
@@ -82,3 +93,11 @@ just_the_docs:
       name: Coral Sand
     quartz_sand:
       name: Quartz Sand
+    
+# ANCHOR - katex for Just-the-docs
+math: katex
+
+# Suppress Sass deprecation warnings
+sass:
+  style: compressed
+  quiet_deps: true
