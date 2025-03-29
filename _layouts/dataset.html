@@ -3,15 +3,15 @@ layout: base
 ---
 
 <article class="dataset-detail">
-  <header>
+  <div class="content">
     <h1>{{ page.title }}</h1>
     <div class="meta">
-      <span class="date">Published: {{ page.date | date: "%B %d, %Y" }}</span>
-      <br/>
-      <span class="author">Author: {{ page.author }}</span>
+      <span class="date"><strong>Published:</strong> {{ page.date | date: "%B %d, %Y" }}  </span>
+      &nbsp;&nbsp;
+      <span class="author"><strong>Author:</strong> {{ page.author }}</span>
       {% if page.categories %}
       <div class="categories">
-        <span>Categories: </span>
+        <span><strong>Categories: </strong> </span>
         {% for category in page.categories %}
           <span class="category-tag">{{ category }}</span> 
           <!-- href="/{{ category | slugify }}"  -->
@@ -20,9 +20,6 @@ layout: base
       </div>
       {% endif %}
     </div>
-  </header>
-
-  <div class="content">
     {{ content }}
   </div>
 

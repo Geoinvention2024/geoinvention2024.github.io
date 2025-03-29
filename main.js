@@ -174,7 +174,22 @@ if (loginSection && registerSection) {
             registerSection.style.display = "block";
           });
         } else {
+          if (error.message.includes('Failed to fetch')) {
+          errorElement.innerHTML = `
+            <div style="text-align: left">
+              <p>Network error detected. Possible causes:</p>
+              <ul>
+                <li>Your browser is blocking cross-origin requests</li>
+                <li>You may need to disable CORS restrictions in development</li>
+                <li>Try refreshing the page or checking your network connection</li>
+              </ul>
+              <p>For Chrome users, you can temporarily disable CORS with:</p>
+              <code>chrome.exe --disable-web-security --user-data-dir="C:/Temp"</code>
+            </div>
+          `;
+        } else {
           errorElement.textContent = "Login failed. Please try again later. If the problem persists, contact support.";
+        }
         }
         errorElement.style.display = "block";
       }
