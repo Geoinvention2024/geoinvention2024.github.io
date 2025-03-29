@@ -1,6 +1,6 @@
 // Appwrite initialization
 const client = new Client()
-  .setEndpoint("http://117.50.71.62/v1")
+  .setEndpoint("https://appwrite.szdisinfo.com/v1")
   .setProject("67e68a8e00363ae05db0");
 
 const account = new Account(client);
