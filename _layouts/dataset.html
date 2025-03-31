@@ -4,7 +4,7 @@ layout: base
 
 <article class="dataset-detail">
   <div class="content">
-    <h1>{{ page.title }}</h1>
+    <h1 id="page-title">{{ page.title }}</h1>
     <div class="meta">
       <span class="date"><strong>Published:</strong> {{ page.date | date: "%B %d, %Y" }}  </span>
       &nbsp;&nbsp;
@@ -65,10 +65,20 @@ layout: base
   }
 </style>
 
+<script type="application/json" id="page-data">
+  {
+    "id": "{{ page.id | escape }}",
+    "title": "{{ page.title | escape }}",
+    "author": "{{ page.author | escape }}",
+    "download_url": "{{ page.download_url | escape }}"
+  }
+</script>
+
 <script>
 (function() {
   document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded - initializing download button');
+    const pageData = JSON.parse(document.getElementById("page-data").textContent);
     const downloadBtn = document.querySelector('.download-btn');
     
     if (downloadBtn) {
@@ -79,10 +89,11 @@ layout: base
           console.log('Checking login status');
           await window.account.get();
           console.log('User logged in, proceeding to download');
+          await window.recordDownload(pageData.id, pageData.title, pageData.author, pageData.download_url);
           window.location.href = this.dataset.url;
         } catch (error) {
           console.error('Login check failed:', error);
-          alert('Please login first to download this dataset');
+          alert('Please login first to download this dataset.');
           setTimeout(() => {
             window.location.href = '/login.html';
           }, 500);

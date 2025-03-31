@@ -1,37 +1,13 @@
 // Appwrite initialization
-const client = new Client()
+const client = new Appwrite.Client()
   .setEndpoint("https://appwrite.szdisinfo.com/v1")
   .setProject("67e68a8e00363ae05db0");
 
-const account = new Account(client);
-const databases = new Databases(client);
-
-// Helper functions
-async function getCurrentUser() {
-  try {
-    return await account.get();
-  } catch (error) {
-    return null;
-  }
-}
-
-async function recordDownload(datasetId, datasetTitle) {
-  const user = await getCurrentUser();
-  if (!user) return;
-
-  await databases.createDocument(
-    "downloads", // collectionId
-    "unique()", // documentId (auto-generated)
-    {
-      userId: user.$id,
-      datasetId: datasetId,
-      timestamp: new Date().toISOString(),
-      email: user.email,
-      userName: user.name,
-      datasetTitle: datasetTitle,
-    }
-  );
-}
+const account = new Appwrite.Account(client);
+const databases = new Appwrite.Databases(client);
+// 数据库和集合 ID
+const databaseId = "67e690b400077eeb670a";
+const collectionId = "67e690d1002e6bf71196";
 
 // Mobile menu toggle
 const menuToggle = document.querySelector(".menu-toggle");
@@ -98,27 +74,27 @@ if (loginSection && registerSection) {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       const errorElement = document.getElementById("auth-error");
-        // Get return URL from query params or referrer
-        let returnUrl = new URLSearchParams(window.location.search).get("return");
-        if (!returnUrl) {
-          // If no explicit return URL, try to get from document.referrer
-          try {
-            const referrer = new URL(document.referrer);
-            if (referrer.origin === window.location.origin) {
-              returnUrl = referrer.pathname + referrer.search;
-            }
-          } catch (e) {
-            console.log("Could not parse referrer:", e);
+      // Get return URL from query params or referrer
+      let returnUrl = new URLSearchParams(window.location.search).get("return");
+      if (!returnUrl) {
+        // If no explicit return URL, try to get from document.referrer
+        try {
+          const referrer = new URL(document.referrer);
+          if (referrer.origin === window.location.origin) {
+            returnUrl = referrer.pathname + referrer.search;
           }
+        } catch (e) {
+          console.log("Could not parse referrer:", e);
         }
-        returnUrl = returnUrl || "/";
+      }
+      returnUrl = returnUrl || "/";
 
-        // Clear previous errors
-        errorElement.textContent = "";
-        errorElement.style.display = "none";
+      // Clear previous errors
+      errorElement.textContent = "";
+      errorElement.style.display = "none";
 
-        console.log("Login attempt started for:", email);
-        console.log("Using return URL:", returnUrl);
+      console.log("Login attempt started for:", email);
+      console.log("Using return URL:", returnUrl);
 
       try {
         if (!email || !password) {
@@ -143,7 +119,7 @@ if (loginSection && registerSection) {
         console.log("Login successful, redirecting to:", returnUrl);
         // Add login=success parameter to trigger session check
         const redirectUrl = new URL(returnUrl, window.location.origin);
-        redirectUrl.searchParams.set('login', 'success');
+        redirectUrl.searchParams.set("login", "success");
         window.location.href = redirectUrl.toString();
       } catch (error) {
         console.error("Login failed:", error);
@@ -168,14 +144,16 @@ if (loginSection && registerSection) {
               <p>Please contact support if you believe this is an error.</p>
             </div>
           `;
-          document.getElementById('switch-to-register')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginSection.style.display = "none";
-            registerSection.style.display = "block";
-          });
+          document
+            .getElementById("switch-to-register")
+            ?.addEventListener("click", (e) => {
+              e.preventDefault();
+              loginSection.style.display = "none";
+              registerSection.style.display = "block";
+            });
         } else {
-          if (error.message.includes('Failed to fetch')) {
-          errorElement.innerHTML = `
+          if (error.message.includes("Failed to fetch")) {
+            errorElement.innerHTML = `
             <div style="text-align: left">
               <p>Network error detected. Possible causes:</p>
               <ul>
@@ -187,9 +165,10 @@ if (loginSection && registerSection) {
               <code>chrome.exe --disable-web-security --user-data-dir="C:/Temp"</code>
             </div>
           `;
-        } else {
-          errorElement.textContent = "Login failed. Please try again later. If the problem persists, contact support.";
-        }
+          } else {
+            errorElement.textContent =
+              "Login failed. Please try again later. If the problem persists, contact support.";
+          }
         }
         errorElement.style.display = "block";
       }
@@ -231,7 +210,55 @@ if (loginSection && registerSection) {
     });
 }
 
+// Helper functions
+async function getCurrentUser() {
+  try {
+    return await account.get();
+  } catch (error) {
+    return null;
+  }
+}
+
+async function recordDownload(datasetId, datasetTitle, datasetAuthor, datasetUrl) {
+  console.log("Recording the download ...");
+  const user = await getCurrentUser();
+  if (!user) {
+    console.log("Get user failed.");
+    return;
+  }
+  console.log("Get user succeed.");
+
+  // 要写入的文档数据
+  const data = {
+    datasetId: datasetId, 
+    datasetTitle: datasetTitle, 
+    datasetAuthor: datasetAuthor,
+    datasetUrl: datasetUrl,
+    userId: user.$id,
+    userName: user.name,
+    userEmail: user.email,
+    createAt: new Date().toISOString(),
+  };
+
+  // // 验证输入数据
+  // if (!data.name || !data.email) {
+  //   console.error("错误: 姓名和邮箱是必填字段");
+  //   process.exit(1);
+  // }
+
+  // 写入数据库
+  console.log(data)
+  try {
+    const response = await databases.createDocument(databaseId, collectionId, Appwrite.ID.unique(), data);
+    console.log("Document write successfully: ", response);
+  } catch (error) {
+    console.error("Document write failed: ", error.message);
+    console.error("Error messages: :", error);
+  }
+}
+
 // Attach to window for global access
 window.client = client;
 window.account = account;
 window.databases = databases;
+window.recordDownload = recordDownload;

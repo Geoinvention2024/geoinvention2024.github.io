@@ -3,8 +3,12 @@ const authBtn = document.getElementById('auth-btn');
 const userEmail = document.getElementById('user-email');
 
 async function checkSession() {
-  console.log('Checking session...')
-  if (!authBtn || !userEmail) return;
+  console.log('Checking session...');
+  if (!authBtn || !userEmail)  {
+    console.log('Checking failed. ');
+    return;
+  }
+  console.log('Checking passed. ');
   
   // Show loading state
   authBtn.disabled = true;
