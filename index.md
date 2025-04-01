@@ -6,7 +6,7 @@ layout: base
 
 # Welcome to Geoinvention Data Hub
 
-Welcome to the official data portal of **Geoinvention**, a research team based at **The Hong Kong Polytechnic University**, led by [Prof. Zhen-yu Yin](http://geoinvention.com/). This site is dedicated to sharing open-access datasets produced by our research in geotechnical engineering and related fields.
+Welcome to the official data portal of **Geoinvention**, a research team based at **The Hong Kong Polytechnic University**, led by [Prof. Zhen-yu Yin](https://research.polyu.edu.hk/en/persons/zhenyu-yin). This site is dedicated to sharing open-access datasets produced by our research in geotechnical engineering and related fields.
 
 🌐 **Team Website**: [http://geoinvention.com/](http://geoinvention.com/)
 
